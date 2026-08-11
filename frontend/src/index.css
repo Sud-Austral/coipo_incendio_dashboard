@@ -1,0 +1,22 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --color-conaf: #a6192e;
+  --color-conaf-dark: #7d1322;
+  --color-estado-entrayecto: #8b93a1;
+  --color-estado-bajoobservacion: #2f7fd6;
+  --color-estado-encombate: #e2481f;
+  --color-estado-controlado: #f2b705;
+  --color-estado-extinguido: #2ea043;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+}
