@@ -1,9 +1,9 @@
 export const ESTADOS = [
-  { key: 'En trayecto', label: 'En trayecto', color: '#8b93a1' },
-  { key: 'Bajo observación', label: 'Bajo observación', color: '#2f7fd6' },
-  { key: 'En Combate', label: 'En Combate', color: '#e2481f' },
-  { key: 'Controlado', label: 'Controlado', color: '#f2b705' },
-  { key: 'Extinguido', label: 'Extinguido (hoy)', color: '#2ea043' },
+  { key: 'En trayecto', label: 'En trayecto', color: '#64748b', icon: '→', tone: 'neutral' },
+  { key: 'Bajo observación', label: 'Bajo observación', color: '#2563eb', icon: '◉', tone: 'info' },
+  { key: 'En Combate', label: 'En combate', color: '#dc2626', icon: '●', tone: 'danger' },
+  { key: 'Controlado', label: 'Controlado', color: '#d97706', icon: '✓', tone: 'warning' },
+  { key: 'Extinguido', label: 'Extinguido', color: '#16a34a', icon: '✓', tone: 'success' },
 ]
-
 export const ESTADO_COLOR = Object.fromEntries(ESTADOS.map((e) => [e.key, e.color]))
+export const ESTADO_META = Object.fromEntries(ESTADOS.map((e) => [e.key, e]))

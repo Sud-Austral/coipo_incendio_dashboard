@@ -1,114 +1,87 @@
 import { useMemo, useState } from 'react'
 import { useIncendios } from './lib/useIncendios.js'
-import {
-  temporadaActual,
-  rangoTemporada,
-  hoyEnChile,
-  soloIncendiosFormales,
-  filtrarPorRangoFecha,
-  filtrarPorRegion,
-  filtrarPorEstado,
-  kpis,
-  magnitud200Vigente,
-  regionComunaBreakdown,
-  porFechaInicio,
-  porHoraInicio,
-  hoyPorRegion,
-} from './lib/derive.js'
-import { ESTADOS } from './lib/estados.js'
+import { temporadaActual, rangoTemporada, hoyEnChile, soloIncendiosFormales, filtrarPorRangoFecha, filtrarPorRegion, filtrarPorEstado, kpis, magnitud200Vigente, regionComunaBreakdown, porFechaInicio, porHoraInicio, topPrioritarios, estadoActual, incendiosIniciadosHoy, fechaMaximaDatos, resumenTemporada, temporadaAnterior } from './lib/derive.js'
 import { Header } from './components/Header.jsx'
-import { Footer } from './components/Footer.jsx'
 import { KpiRow } from './components/KpiRow.jsx'
-import { LeftPanel } from './components/LeftPanel.jsx'
+import { Filters } from './components/Filters.jsx'
+import { RegionalPanel } from './components/RegionalPanel.jsx'
+import { TrendPanel } from './components/TrendPanel.jsx'
 import { FireMap } from './components/FireMap.jsx'
-import { RightPanel } from './components/RightPanel.jsx'
+import { PriorityPanel } from './components/PriorityPanel.jsx'
+import { DetailPanel } from './components/DetailPanel.jsx'
+import { TodayPanel } from './components/TodayPanel.jsx'
+import { SeasonPanel } from './components/SeasonPanel.jsx'
+import { Footer } from './components/Footer.jsx'
+import { ExecutiveView } from './components/ExecutiveView.jsx'
+import './components/ExecutiveView.css'
 
 function App() {
   const { data, loading, error, lastUpdated, refetch } = useIncendios()
   const temporada = useMemo(() => temporadaActual(), [])
   const rango = useMemo(() => rangoTemporada(temporada), [temporada])
+  const hoy = hoyEnChile()
+  const [filtros, setFiltros] = useState({ region: 'Todas', estado: 'Todos', desde: rango.desde, hasta: hoy })
+  const [selected, setSelected] = useState(null)
+  const [view, setView] = useState('operational')
+  const incendios = useMemo(() => data ? soloIncendiosFormales(data) : [], [data])
+  const filtered = useMemo(() => filtrarPorEstado(filtrarPorRegion(filtrarPorRangoFecha(incendios, filtros.desde, filtros.hasta), filtros.region), filtros.estado), [incendios, filtros])
+  const currentSeason = useMemo(() => incendios.filter((i) => i.inicio?.slice(0, 4) === '2026' && i.inicio?.slice(5, 7) >= '07'), [incendios])
+  const k = useMemo(() => ({ ...kpis(filtered), vigentes: filtered.filter((i) => i.estado !== 'Extinguido').length, magnitud: magnitud200Vigente(filtered), estadoActual: estadoActual(filtered) }), [filtered])
+  const regional = useMemo(() => regionComunaBreakdown(filtered), [filtered])
+  const trend = useMemo(() => porFechaInicio(filtered).slice(-14), [filtered])
+  const hourly = useMemo(() => porHoraInicio(filtered), [filtered])
+  const priority = useMemo(() => topPrioritarios(filtered), [filtered])
+  const todayRows = useMemo(() => incendiosIniciadosHoy(incendios, hoy), [incendios, hoy])
+  const today = useMemo(() => ({ total: todayRows.length, surface: todayRows.reduce((a, i) => a + (Number(i.superficieHa) || 0), 0), states: estadoActual(todayRows) }), [todayRows])
+  const maxDataDate = useMemo(() => fechaMaximaDatos(incendios), [incendios])
+  const prevSeason = temporadaAnterior(temporada)
+  const currentSummary = useMemo(() => resumenTemporada(incendios, temporada), [incendios, temporada])
+  const previousSummary = useMemo(() => resumenTemporada(incendios, prevSeason), [incendios, prevSeason])
+  const stale = maxDataDate && maxDataDate < hoy
+  const reset = () => { setFiltros({ region: 'Todas', estado: 'Todos', desde: rango.desde, hasta: hoy }); setSelected(null) }
+  const onFilter = (patch) => { setFiltros((p) => ({ ...p, ...patch })); if (patch.region || patch.estado) setSelected(null) }
 
-  const [filtros, setFiltros] = useState(() => ({
-    region: 'Todas',
-    estado: 'Todos',
-    desde: rango.desde,
-    hasta: hoyEnChile(),
-  }))
+  if (loading) return <div className="loading-screen"><div className="loader"/><strong>Cargando situación de incendios…</strong><span>Procesando registros y preparando el mapa.</span></div>
+  if (error) return <div className="loading-screen error"><strong>No fue posible cargar los datos</strong><span>{error.message}</span><button onClick={refetch}>Reintentar</button></div>
 
-  const onFiltrosChange = (patch) => setFiltros((prev) => ({ ...prev, ...patch }))
-
-  // Un "Foco" es un punto de calor que puede o no escalar a incendio — esta
-  // vista solo cuenta incendios formalizados, igual que el Power BI de
-  // referencia (ver nota en derive.js). Todo lo demás parte de acá, no de `data`.
-  const incendios = useMemo(() => (data ? soloIncendiosFormales(data) : []), [data])
-
-  const filtered = useMemo(() => {
-    const porFecha = filtrarPorRangoFecha(incendios, filtros.desde, filtros.hasta)
-    const porRegion = filtrarPorRegion(porFecha, filtros.region)
-    return filtrarPorEstado(porRegion, filtros.estado)
-  }, [incendios, filtros])
-
-  // La tabla "hoy" respeta región/estado pero no el rango de fecha elegido —
-  // "hoy" es un concepto fijo (día calendario actual), no otro filtro de fecha.
-  const hoyBase = useMemo(() => {
-    const porRegion = filtrarPorRegion(incendios, filtros.region)
-    return filtrarPorEstado(porRegion, filtros.estado)
-  }, [incendios, filtros.region, filtros.estado])
-
-  const regionRows = useMemo(() => regionComunaBreakdown(filtered), [filtered])
-  const porFecha = useMemo(() => porFechaInicio(filtered), [filtered])
-  const porHora = useMemo(() => porHoraInicio(filtered), [filtered])
-  const hoyData = useMemo(() => hoyPorRegion(hoyBase), [hoyBase])
-
-  // El bloque "Estado actual de los incendios" de los KPIs es una foto de HOY
-  // (misma fuente que la tabla "hoy"), no un acumulado de la temporada — si no,
-  // "Extinguido (hoy)" terminaría mostrando el total histórico de extinguidos.
-  const kpisData = useMemo(() => {
-    const { total, superficieHa } = kpis(filtered)
-    const porEstado = Object.fromEntries(ESTADOS.map((e) => [e.key, hoyData.total[e.key]]))
-    return { total, superficieHa, magnitud200: magnitud200Vigente(hoyBase), porEstado }
-  }, [filtered, hoyBase, hoyData])
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-white text-slate-500">
-        Cargando datos de incendios…
+  return <div className="app-shell">
+    <Header temporada={temporada} lastUpdated={lastUpdated} maxDataDate={maxDataDate} stale={stale}/>
+    <nav className="dashboard-tabs" role="tablist" aria-label="Vista del dashboard">
+      <div className="dashboard-tabs-inner">
+        <button className={view === 'executive' ? 'active' : ''} onClick={() => { setView('executive'); setSelected(null) }} role="tab" aria-selected={view === 'executive'}>
+          <span className="tab-icon" aria-hidden="true">▣</span>
+          <span>Ejecutiva</span>
+        </button>
+        <button className={view === 'operational' ? 'active' : ''} onClick={() => setView('operational')} role="tab" aria-selected={view === 'operational'}>
+          <span className="tab-icon" aria-hidden="true">⌖</span>
+          <span>Operacional</span>
+        </button>
       </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-white text-red-600">
-        Error cargando datos: {error.message}
+    </nav>
+    {view === 'executive' ? <ExecutiveView
+      data={incendios}
+      temporada={temporada}
+      previousSeason={prevSeason}
+      currentSummary={currentSummary}
+      previousSummary={previousSummary}
+      maxDataDate={maxDataDate}
+      stale={stale}
+      priority={priority}
+      onSelect={(inc) => { setSelected(inc); setView('operational') }}
+    /> : <main className="dashboard-main">
+      <KpiRow kpis={k} selectedEstado={filtros.estado} onEstado={(estado) => onFilter({ estado })}/>
+      <div className="workspace">
+        <aside className="left-column">
+          <Filters filtros={filtros} onChange={onFilter} onReset={reset}/>
+          <RegionalPanel rows={regional} selectedRegion={filtros.region} onRegion={(region) => onFilter({ region })}/>
+          <TrendPanel data={trend} hourly={hourly}/>
+        </aside>
+        <section className="center-column"><FireMap incendios={filtered} selected={selected} onSelect={setSelected}/><div className="center-bottom"><SeasonPanel current={currentSummary} previous={previousSummary} currentLabel={temporada} previousLabel={prevSeason}/></div></section>
+        <aside className="right-column"><PriorityPanel rows={priority} selected={selected} onSelect={setSelected}/><DetailPanel incendio={selected} onClear={() => setSelected(null)}/><TodayPanel today={today} todayDate={hoy} dataMaxDate={maxDataDate}/></aside>
       </div>
-    )
-  }
-
-  return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-50">
-      <Header temporada={temporada} lastUpdated={lastUpdated} />
-      <KpiRow kpis={kpisData} />
-      <div className="grid min-h-0 min-w-0 flex-1 grid-cols-1 gap-2 overflow-hidden p-2 lg:grid-cols-[380px_1fr_420px]">
-        <div className="min-h-0 min-w-0 overflow-y-auto">
-          <LeftPanel
-            filtros={filtros}
-            onFiltrosChange={onFiltrosChange}
-            regionRows={regionRows}
-            porFecha={porFecha}
-            porHora={porHora}
-          />
-        </div>
-        <div className="min-h-[300px] min-w-0">
-          <FireMap incendios={filtered} />
-        </div>
-        <div className="min-h-0 min-w-0 overflow-y-auto">
-          <RightPanel hoy={hoyData} listado={filtered} />
-        </div>
-      </div>
-      <Footer temporada={temporada} onRefresh={refetch} />
-    </div>
-  )
+    </main>}
+    <Footer temporada={temporada} onRefresh={refetch} maxDataDate={maxDataDate} recordCount={incendios.length}/>
+  </div>
 }
 
 export default App
