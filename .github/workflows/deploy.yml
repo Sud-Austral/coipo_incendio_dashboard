@@ -25,9 +25,9 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -37,12 +37,11 @@ jobs:
 
       - run: npm run build
 
-      # enablement: true activa GitHub Pages en el repo si aún no lo está,
-      # sin tener que entrar a Settings → Pages.
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
+      # Sin actions/configure-pages: su `enablement: true` fallaba con
+      # "Resource not accessible by integration" (el GITHUB_TOKEN no puede crear
+      # el sitio de Pages en este repo de organización) y sus outputs no hacen
+      # falta acá, porque vite compila con `base: './'` y no necesita conocer la
+      # URL. Pages quedó habilitado a mano en Settings → Pages → GitHub Actions.
       - uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
