@@ -16,6 +16,9 @@ Rediseño operacional del dashboard de incendios forestales a partir de la versi
 - Estado de frescura de los datos: no se inventa una actualización cuando el archivo local no contiene registros recientes.
 - Diseño responsive y accesible, con estado identificado por color + texto/icono.
 
+
+
+
 ## Ejecutar
 
 ```bash
