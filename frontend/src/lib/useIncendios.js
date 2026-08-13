@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ungzip } from 'pako'
 
-const DATA_URL = '/data/incendios.json.gz'
+// BASE_URL respeta la `base` de vite.config.js ('/' en dev, './' en build), para
+// que el fetch funcione tanto en la raíz como bajo el subdirectorio de GitHub Pages.
+const DATA_URL = `${import.meta.env.BASE_URL}data/incendios.json.gz`
 const REFRESH_MS = 5 * 60 * 1000
 
 /**
@@ -27,8 +29,12 @@ export function useIncendios() {
         // rompería (magic header inválido). Solo usamos pako si los bytes
         // siguen siendo gzip real (magic 0x1f 0x8b).
         const esGzip = bytes[0] === 0x1f && bytes[1] === 0x8b
-        const json = esGzip ? ungzip(bytes, { to: 'string' }) : new TextDecoder('utf-8').decode(bytes)
-        return JSON.parse(json)
+        // pako 3 SIEMPRE devuelve Uint8Array: la opción `{ to: 'string' }` de
+        // pako 2 ya no existe y se ignora en silencio (JSON.parse recibía el
+        // array coaccionado a "91,123,34,..." y fallaba). Decodificar siempre
+        // los bytes con TextDecoder, vengan de pako o del transporte.
+        const planos = esGzip ? ungzip(bytes) : bytes
+        return JSON.parse(new TextDecoder('utf-8').decode(planos))
       })
       .then((data) => {
         if (!cancelledRef.current) {
