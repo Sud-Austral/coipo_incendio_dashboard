@@ -1,6 +1,10 @@
 import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, CircleMarker, Marker, Tooltip, ZoomControl, useMap } from 'react-leaflet'
 import { divIcon } from 'leaflet'
+<<<<<<< Updated upstream
 import { useEffect, useMemo, useState } from 'react'
+=======
+import React, {useEffect, useMemo, useState} from "react";
+>>>>>>> Stashed changes
 import { ESTADO_COLOR, ESTADO_META } from '../lib/estados.js'
 import { formatHa, fechaHoraLocal } from '../lib/derive.js'
 import { CHILE_CENTER, CHILE_INITIAL_ZOOM, puntoAproximado } from '../lib/geo.js'
@@ -24,6 +28,11 @@ const BASE_MAPS = {
 }
 
 function MapFocus({ selected }) {
+<<<<<<< Updated upstream
+=======
+  const [showLayerPanel, setShowLayerPanel] = React.useState(false);
+
+>>>>>>> Stashed changes
   const map = useMap()
 
   useEffect(() => {
@@ -41,9 +50,39 @@ function MapFocus({ selected }) {
 function MapViewReset() {
   const map = useMap()
   const reset = () => map.flyTo(CHILE_CENTER, CHILE_INITIAL_ZOOM, { animate: true, duration: 0.9 })
+<<<<<<< Updated upstream
   return <button type="button" className="map-reset-view" onClick={reset} title="Volver a la vista general de Chile">
     Ver todo Chile
   </button>
+=======
+  return <div className="operational-map-actions">
+        <button
+          type="button"
+          className="operational-layers-button"
+          onClick={() => setShowLayerPanel((v) => !v)}
+          aria-expanded={showLayerPanel}
+        >
+          ☷ CAPAS {showLayerPanel ? "▲" : "▼"}
+        </button>
+        <button type="button" className="map-reset-view" onClick={reset} title="Volver a la vista general de Chile">
+    Ver todo Chile
+  </button>
+        {showLayerPanel && (
+          <div className="operational-layers-panel">
+            <div className="operational-layers-title">CAPAS DEL MAPA</div>
+            <label><input type="checkbox" defaultChecked /> Incendios</label>
+            <label><input type="checkbox" /> Focos satelitales</label>
+            <label><input type="checkbox" /> Riesgo de incendio</label>
+            <label><input type="checkbox" /> Interfaz urbano-forestal</label>
+            <div className="operational-layers-separator" />
+            <div className="operational-layers-title">MAPA BASE</div>
+            <label><input type="radio" name="operational-base-map" defaultChecked /> Calles</label>
+            <label><input type="radio" name="operational-base-map" /> Satélite</label>
+            <label><input type="radio" name="operational-base-map" /> Topográfico</label>
+          </div>
+        )}
+      </div>
+>>>>>>> Stashed changes
 }
 
 function FireTooltip({ incendio }) {
@@ -92,7 +131,11 @@ function LayerSwitch({ checked, disabled, onChange, label, note, swatch }) {
 function LayerControl({ baseMap, setBaseMap, layers, setLayers, firmsReady, riskStatus, interfaceStatus }) {
   const [open, setOpen] = useState(false)
   return <div className={`map-layer-control ${open ? 'open' : ''}`}>
+<<<<<<< Updated upstream
     <button type="button" className="map-layer-trigger" onClick={() => setOpen((v) => !v)} aria-expanded={open}>☷ Capas</button>
+=======
+    <button type="button" className="map-layer-trigger" onClick={() => setOpen((v) => !v)} aria-expanded={open}><span className="map-layer-trigger-icon">▱</span><span>CAPAS</span><span className="map-layer-trigger-caret">{open ? "▲" : "▼"}</span></button>
+>>>>>>> Stashed changes
     {open && <div className="map-layer-menu">
       <div className="map-layer-section-title">CAPAS DEL MAPA</div>
       <LayerSwitch checked={layers.incendios} onChange={(v) => setLayers((p) => ({ ...p, incendios: v }))} label="Incendios" note="Registros del dashboard" swatch="#971b2f" />
