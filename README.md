@@ -1,42 +1,22 @@
-# COIPO Incendios Forestales — Dashboard 10/10
+# React + Vite
 
-Rediseño operacional del dashboard de incendios forestales a partir de la versión original entregada.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## Qué incluye
+Currently, two official plugins are available:
 
-- Situación actual separada de incendios iniciados hoy.
-- KPIs operacionales: incendios del período, superficie, vigentes, en combate, observación, controlados y magnitud >200 ha.
-- Mapa central con marcadores por estado y tamaño proporcional a superficie.
-- Ranking de incendios prioritarios.
-- Panel de detalle al seleccionar un incendio.
-- Distribución regional y evolución diaria.
-- Distribución horaria de inicio.
-- Comparación de temporada actual con temporada anterior cuando los datos lo permiten.
-- Filtros de región, estado y fecha.
-- Estado de frescura de los datos: no se inventa una actualización cuando el archivo local no contiene registros recientes.
-- Diseño responsive y accesible, con estado identificado por color + texto/icono.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Ejecutar
+## React Compiler
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-Luego abrir la URL mostrada por Vite.
+## Expanding the Oxlint configuration
 
-## Build de producción
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
 
-```bash
-cd frontend
-npm run build
-```
+## Versión 1.10.0 - Capas de contexto territorial
 
-## Fuente de datos
+Candidata para validación. Agrega selector de capas, mapas base Calles/Satélite/Topográfico, integración configurable NASA FIRMS VIIRS y soporte local GeoJSON para Riesgo e Interfaz urbano-forestal. El algoritmo de prioridad no fue modificado.
 
-Se conserva el archivo:
-
-`frontend/public/data/incendios.json.gz`
-
-El dashboard cuenta solamente registros `tipo === "Incendio"`, manteniendo la lógica de negocio de la versión original.
+Consulta `CAPAS_MAPA.md` para configuración.

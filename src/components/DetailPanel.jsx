@@ -1,0 +1,9 @@
+import { ESTADO_META } from '../lib/estados.js'
+import { fechaHoraLocal, formatHa } from '../lib/derive.js'
+
+export function DetailPanel({ incendio, onClear }) {
+  if (!incendio) return <section className="panel detail-panel empty-detail"><div className="detail-placeholder"><span>⌖</span><strong>Selecciona un incendio</strong><p>Haz clic en un marcador del mapa o en un incendio prioritario para ver el detalle.</p></div></section>
+  const meta = ESTADO_META[incendio.estado] || {}
+  const f = fechaHoraLocal(incendio.inicio)
+  return <section className="panel detail-panel"><div className="panel-heading"><div><span className="panel-kicker">DETALLE</span><h2>Incendio seleccionado</h2></div><button className="ghost-button" onClick={onClear}>Cerrar</button></div><div className="detail-title"><span className="detail-status" style={{ background: meta.color }}>{meta.icon}</span><div><h3>{incendio.nombre || 'Incendio sin nombre'}</h3><p>{incendio.region || 'Sin región'} · {incendio.comuna || 'Sin comuna'}</p></div></div><div className="detail-grid"><div><span>Estado</span><strong style={{ color: meta.color }}>{meta.label || incendio.estado}</strong></div><div><span>Superficie</span><strong>{formatHa(incendio.superficieHa)} ha</strong></div><div><span>Inicio</span><strong>{f ? `${String(f.d).padStart(2,'0')}-${String(f.m).padStart(2,'0')}-${f.y}` : '--'}</strong></div><div><span>Hora</span><strong>{f ? `${String(f.hh).padStart(2,'0')}:${String(f.mm).padStart(2,'0')}` : '--'}</strong></div><div><span>Tipo de registro</span><strong>{incendio.tipo || '--'}</strong></div><div><span>ID</span><strong>{incendio.id ?? '--'}</strong></div></div><div className="detail-note">La posición mostrada en el mapa es aproximada por región cuando el dataset no entrega coordenadas exactas por incendio.</div></section>
+}
