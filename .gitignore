@@ -1,0 +1,42 @@
+# .gitignore
+
+# Este repositorio no tenia ninguno. Las reglas de abajo se eligieron
+# mirando lo que el repositorio contiene de verdad, no por plantilla.
+#
+# Importante: un .gitignore NO des-versiona lo que git ya sigue. Si aqui
+# aparece una regla para algo que ya esta versionado, hace falta ademas
+# `git rm --cached <ruta>` para retirarlo del indice. Eso lo decide una
+# persona; este archivo solo evita que la lista siga creciendo.
+
+# --- Artefactos del generador automatico de README ---
+# Los produce Sud-Austral/coipo_aireadme en cada corrida y se regeneran solos.
+README_CANDIDATE.md
+readme_context/
+
+# --- Secretos y configuracion local ---
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# --- Sistema operativo y editores ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/
+
+# --- Node y frontend ---
+node_modules/
+dist/
+build/
+.vite/
+.next/
+.cache/
+coverage/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
