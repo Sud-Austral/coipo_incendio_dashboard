@@ -1,0 +1,81 @@
+# Manifiesto derivado del codigo. Una entrada por archivo relevante:
+# manifiestos de dependencias, datos, configuracion y publicacion.
+# El contenido de los archivos no se leyo; solo su ruta, su tamano y como los
+# consume el codigo segun la evidencia.
+
+archivos:
+
+  - ruta: frontend/package.json
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable; conteo de coincidencias 0 en la evidencia. Es un manifiesto de dependencias"
+    puede_versionarse: true
+    uso: "Manifiesto de dependencias de la interfaz: declara 13 dependencias y 4 comandos (dev, build, lint, preview) [frontend/package.json:7]"
+
+  - ruta: frontend/package-lock.json
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable; conteo de coincidencias 0 en la evidencia"
+    puede_versionarse: true
+    uso: "[INFERIDO] Fija las versiones exactas resueltas del manifiesto anterior; la evidencia lo lista como archivo clave [frontend/package-lock.json]"
+
+  - ruta: frontend/public/data/incendios.json.gz
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] no evaluable desde la evidencia: el archivo esta comprimido y su contenido no se leyo, de modo que el conteo de patrones de dato personal es desconocido, no cero. No vive en tests, fixtures, mocks ni seed, sino en el directorio de recursos publicos, lo que aumenta la exposicion si contuviera datos personales"
+    puede_versionarse: "[VERIFICAR] hoy esta versionado; depende de que resuelva la linea anterior"
+    uso: "Unica fuente de datos de la aplicacion: la lee el enganche que declara la ruta del dato y el intervalo de refresco [frontend/src/lib/useIncendios.js]"
+
+  - ruta: frontend/vite.config.js
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable; conteo de coincidencias 0 en la evidencia"
+    puede_versionarse: true
+    uso: "Configuracion de construccion de la interfaz; importa el empaquetador y dos complementos [frontend/vite.config.js:1]"
+
+  - ruta: frontend/.oxlintrc.json
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable; conteo de coincidencias 0 en la evidencia"
+    puede_versionarse: true
+    uso: "[INFERIDO] Configuracion del revisor de estilo que ejecuta el comando declarado [frontend/package.json:9]"
+
+  - ruta: .github/workflows/deploy.yml
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable en la evidencia; el contenido no se leyo, por lo que no se descarta que declare secretos o correos de notificacion"
+    puede_versionarse: true
+    uso: "Flujo de publicacion; la evidencia lo clasifica bajo archivos de despliegue [.github/workflows/deploy.yml]"
+
+  - ruta: .github/workflows/readme.yml
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable en la evidencia; el contenido no se leyo"
+    puede_versionarse: true
+    uso: "Segundo flujo clasificado por la evidencia bajo archivos de despliegue [.github/workflows/readme.yml]"
+
+  - ruta: README.md
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable; conteo de coincidencias 0 en el resumen que trae la evidencia"
+    puede_versionarse: true
+    uso: "Documentacion del repositorio; declara la fuente de datos y una regla de conteo heredada [README.md:1]"
+
+  - ruta: frontend/README.md
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] sin patron de dato personal detectable en la evidencia; su contenido no se incorporo"
+    puede_versionarse: true
+    uso: "[INFERIDO] Documentacion de la interfaz; la evidencia lo lista como archivo clave [frontend/README.md]"
+
+  - ruta: CLAUDE.md
+    sha256: "[PENDIENTE] sin calcular"
+    origen: "[PENDIENTE] quien lo entrego y cuando"
+    contiene_pii: "[VERIFICAR] contenido no incorporado a la evidencia salvo dos coincidencias de palabra clave [CLAUDE.md:5] y [CLAUDE.md:16]; conteo de patrones de dato personal desconocido"
+    puede_versionarse: true
+    uso: "[PENDIENTE] archivo de instrucciones internas; su proposito no es deducible de la evidencia disponible"
+
+pendientes_del_manifiesto:
+  - "[PENDIENTE] No hay archivo de ejemplo de variables de entorno en la evidencia, pese a que el codigo usa una variable de ruta base [frontend/src/lib/useIncendios.js:6]. Falta declarar donde se define."
+  - "[PENDIENTE] No hay archivos semilla ni migraciones que sellar: los bloques de tablas de base de datos de la evidencia vienen vacios."
+  - "[VERIFICAR] El archivo de datos esta versionado y servido como recurso publico. Si su contenido resultara contener datos personales, corresponde revisar tanto su versionado como su exposicion. Este manifiesto no edita .gitignore ni ningun otro archivo."
