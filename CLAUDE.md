@@ -18,7 +18,8 @@ Stack: **React 19 + Vite + Tailwind v4**, JavaScript (no TypeScript). Gráficos 
 ## Estado actual del proyecto
 
 - La primera vista ("Situación Actual Incendios Forestales") está **construida y funcionando** contra el archivo real `frontend/public/data/incendios.json.gz`. Ver "Estructura de archivos" abajo.
-- No hay backend ni router todavía — sigue siendo una SPA de una sola vista (home / `/`), a propósito, hasta que se definan las siguientes ~10 pantallas.
+- No hay backend ni router (react-router no está en `package.json`). `App.jsx` alterna con un estado `view` entre dos pestañas: **Operacional** (la vista descrita abajo) y **Ejecutiva** (`ExecutiveView.jsx`, agregada después; la sección «Vista principal» de este archivo describe el diseño original de la vista Operacional, y los componentes `LeftPanel`/`RightPanel` que menciona se reemplazaron por `Filters`, `RegionalPanel`, `TrendPanel`, `PriorityPanel`, `DetailPanel`, `TodayPanel` y `SeasonPanel`).
+- Además hay `SeasonPanel` (temporada actual vs anterior), `DetailPanel` (detalle del incendio seleccionado), `PriorityPanel` (ranking) y aviso de datos desactualizados (`stale`) cuando la fecha máxima del archivo es anterior a hoy.
 - Los KPIs de la temporada actual (19 incendios / 16.6ha) calzan exactamente con la captura de referencia del Power BI — es la validación más fuerte que hay hasta ahora de que la lógica de negocio (temporada, `tipo === 'Incendio'`, agregaciones) está bien implementada. Si en el futuro este número deja de calzar contra el Power BI real, sospechar primero de un cambio en los datos (el dataset real crece con el tiempo) antes que del código.
 
 ## Estructura de archivos
@@ -30,7 +31,8 @@ Stack: **React 19 + Vite + Tailwind v4**, JavaScript (no TypeScript). Gráficos 
 | `src/lib/regiones.js` | Las 16 regiones de Chile en orden norte-sur, con el nombre exacto tal como viene en el dato. |
 | `src/lib/geo.js` | Centroides aproximados por región + jitter determinístico por id, para el mapa (ver limitación de datos abajo). |
 | `src/lib/useIncendios.js` | Hook que hace fetch + descompresión + parseo del JSON, con refresco cada 5 min. |
-| `src/components/*.jsx` | Header, Footer, KpiRow, LeftPanel (filtros + tabla región/comuna + 2 gráficos), FireMap, RightPanel (tabla hoy + listado). Todos reciben datos ya calculados vía props — no recalculan lógica de negocio. |
+| `src/lib/deriveExecutive.js` | Derivaciones de la vista Ejecutiva (resumen, tendencia, regiones, variación frente a la temporada anterior). |
+| `src/components/*.jsx` | Header, Footer, KpiRow, Filters, RegionalPanel, TrendPanel, FireMap, SeasonPanel, PriorityPanel, DetailPanel, TodayPanel (vista Operacional) y ExecutiveView (+ `ExecutiveView.css`). Reciben datos ya calculados vía props. Nota: `ExecutiveView.jsx` sí importa y usa helpers de `derive.js` y `deriveExecutive.js` directamente. |
 | `src/App.jsx` | Único punto que orquesta: carga datos, aplica filtros, llama a `derive.js`, arma las props de cada componente. |
 
 ## Vista principal — "Situación Actual Incendios Forestales"
@@ -127,3 +129,8 @@ Reglas de negocio (implementadas en `derive.js`, no reimplementar en componentes
 - ¿Cómo se va a validar número a número contra el Power BI antes de publicar? (¿snapshot manual lado a lado? ¿script de diff automatizado?)
 - ¿Se consigue algún día coordenadas reales por incendio/comuna para el mapa, o se acepta la aproximación por región de forma permanente?
 - ¿Proveedor de mapa final: OpenStreetMap (gratis, ya andando) o Esri/ArcGIS (como la referencia visual, requiere licencia)?
+
+
+## Comandos y despliegue (actualizado 2026-10-24, leído de `frontend/package.json` y `.github/workflows/deploy.yml`)
+
+Desde `frontend/`: `npm install` (o `npm ci`), `npm run dev`, `npm run build`, `npm run lint` (oxlint), `npm run preview`. No hay pruebas automáticas. El despliegue es a GitHub Pages con push a `main` que toque `frontend/**` (`base: './'` en `vite.config.js`; no usar rutas absolutas). Los documentos de `insumos/` (problema, solución, `MANIFIESTO.yaml`) se generaron desde el código; no cierres sus marcas `[PENDIENTE]` / `[VERIFICAR]` por tu cuenta. `frontend/README.md` es la plantilla de create-vite, no documenta este proyecto. No ejecuté build ni lint al escribir esta sección.
