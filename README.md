@@ -15,6 +15,7 @@ Rediseño operacional del dashboard de incendios forestales a partir de la versi
 - Filtros de región, estado y fecha.
 - Estado de frescura de los datos: no se inventa una actualización cuando el archivo local no contiene registros recientes.
 - Diseño responsive y accesible, con estado identificado por color + texto/icono.
+- Dos vistas por pestañas: **Operacional** (lo anterior) y **Ejecutiva** (resumen, tendencia, regiones y variación frente a la temporada anterior; `frontend/src/components/ExecutiveView.jsx`).
 
 
 
@@ -36,6 +37,12 @@ cd frontend
 npm run build
 ```
 
+Otros scripts: `npm run lint` (oxlint) y `npm run preview`. No hay pruebas automáticas.
+
+## Despliegue
+
+`.github/workflows/deploy.yml` compila `frontend/` y publica en GitHub Pages con cada push a `main` que toque `frontend/**`.
+
 ## Fuente de datos
 
 Se conserva el archivo:
@@ -43,3 +50,8 @@ Se conserva el archivo:
 `frontend/public/data/incendios.json.gz`
 
 El dashboard cuenta solamente registros `tipo === "Incendio"`, manteniendo la lógica de negocio de la versión original.
+
+## Más documentación
+
+- [CLAUDE.md](CLAUDE.md): guía para agentes (reglas de negocio, estructura, trampas).
+- [insumos/00-PROBLEMA.md](insumos/00-PROBLEMA.md) y [insumos/01-SOLUCION.md](insumos/01-SOLUCION.md): problema y solución leídos del código.
