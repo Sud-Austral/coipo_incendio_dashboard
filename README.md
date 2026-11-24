@@ -37,7 +37,7 @@ cd frontend
 npm run build
 ```
 
-Otros scripts: `npm run lint` (oxlint) y `npm run preview`. No hay pruebas automáticas.
+Otros scripts: `npm run lint` (oxlint) y `npm run preview`. No hay pruebas automáticas. Verificado el 2026-11-24: `npm ci && npm run build` pasa y `npm run lint` sale 0 con 9 avisos. El CI usa Node 22 y `npm ci`.
 
 ## Despliegue
 
